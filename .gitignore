@@ -1,0 +1,6 @@
+data/
+solution_csv/
+solution_text/
+env/
+final_schedule.csv
+fitness_report.csv
