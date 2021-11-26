@@ -65,9 +65,13 @@ class ScheduleProblem(PermutationProblem):
 
     
     def __get_rooms(self, class_capacity_level):
-        level_rooms = self.df_rooms['Nivel capacidade'].unique()
+        level_rooms = self.df_rooms['Capacidade Normal'].unique()
         min_capacity = level_rooms[level_rooms<=class_capacity_level].max() if len(level_rooms[level_rooms<=class_capacity_level]) != 0 else class_capacity_level
-        rooms_filtered = self.df_rooms[(self.df_rooms['Nivel capacidade'] >= min_capacity)]
+        #use_min = False
+        #if abs(class_capacity_level-min_capacity) <= 5:
+        #    use_min = True
+        #rooms_filtered = self.df_rooms[(self.df_rooms['Capacidade Normal'] >= min_capacity)] if use_min else self.df_rooms[(self.df_rooms['Capacidade Normal'] >= class_capacity_level)]
+        rooms_filtered = self.df_rooms[(self.df_rooms['Capacidade Normal'] >= min_capacity)]
         return rooms_filtered['Code'].reset_index(drop=True)
 
     # Stills needs to be better
@@ -80,57 +84,43 @@ class ScheduleProblem(PermutationProblem):
             if class_init not in timetable:
                 available_rooms.append(index)
         filtered_rooms = np.take(array_rooms, available_rooms).reset_index(drop=True) if len(available_rooms) != 0 else array_rooms
-        #print(filtered_rooms.tolist())
-        #print(available_rooms)
-        #print("\n")
-        #Simple filtered_rooms
-        #filtered_rooms_simple = available_rooms if len(available_rooms) != 0 else array_rooms
         random_index = random.randint(0, len(filtered_rooms)-1)
-        #non_error_response = filtered_rooms[random_index]
-        #simple_error = filtered_rooms_simple[random_index]
-        #print('Oficial: ', filtered_rooms)
-        #print('Simpler: ', filtered_rooms_simple)
-        #print("\n")
-        #Implementation for new solution
-        #boolean_rooms = self.df_rooms.Code.isin(filtered_rooms)
-        #df_final = self.df_rooms[boolean_rooms].sort_values(['Nivel capacidade']).reset_index(drop=True)
-        return filtered_rooms[random_index] #df_final.head(random_index)['Code'][0] if len(df_final) > 1 else df_final.head(1)['Code'][0]
+        return filtered_rooms[random_index]
 
-            
+    # Generates solution for algorithm
     def create_solution(self) -> PermutationSolution:
         new_solution = PermutationSolution(number_of_variables=self.number_of_variables,
                                            number_of_objectives=self.number_of_objectives)
-        rooms_timetable = []
+        
+        rooms_timetable = [] # Matrix that has schedule for each room
         schedule = [None] * len(self.df_classes)
 
         for _ in range(len(self.df_rooms)):
             rooms_timetable.append([])
 
-        max_index = self.number_of_variables - 1 #NEW solution
-        add_next_class = False #NEW solution
+        max_index = self.number_of_variables - 1
+        add_next_class = False
         for index in range(len(self.df_classes)):
-            #Implementation for new solution
-            if add_next_class == True:
+            if add_next_class == True: # If was added next class then pass to next index
                 add_next_class = False
                 continue
-            class_capacity_level = int(self.df_classes.loc[index, 'Nivel capacidade'])
+            # Extract useful info of current class
+            class_capacity_level = int(self.df_classes.loc[index, 'Inscritos no turno (no 1º semestre é baseado em estimativas)'])
             class_uc = str(self.df_classes.loc[index, 'Unidade de execução']) #NEW solution
             class_init = str(self.df_classes.loc[index, 'Início'])
             class_final = str(self.df_classes.loc[index, 'Fim'])
             class_final_date_obj = datetime.strptime(class_final, '%d/%m/%Y %H:%M:%S')
-            #Return array of available rooms for that capacity
-            array_rooms = self.__get_rooms(class_capacity_level) #Get's room for that capacity
-            #print('Class capacity: ', class_capacity_level)
-            best_room = self.__choose_best_room(rooms_timetable, array_rooms, class_init)
-            #Function that chooses the best room via input array rooms 
-            schedule[index] = best_room
-            rooms_timetable[best_room].append(class_init)
-            #NEW solution --> it's getting fitness3 > 0
+            # Return array of available rooms for that capacity
+            array_rooms = self.__get_rooms(class_capacity_level) #Get array of rooms that can handle class capacity
+            best_room = self.__choose_best_room(rooms_timetable, array_rooms, class_init) # Chooses the best room class
+            schedule[index] = best_room # Append the room for class
+            rooms_timetable[best_room].append(class_init) # Append time for that room
+            # Check if next class is the same as the current class
             if (index+1) <= max_index: #Can't surpass the maximum index
                 next_index = index+1
                 next_class_uc = str(self.df_classes.loc[next_index, 'Unidade de execução'])
                 next_class_init = str(self.df_classes.loc[next_index, 'Início'])
-                next_class_init_obj = datetime.strptime(next_class_init, '%d/%m/%Y %H:%M:%S')
+                next_class_init_obj = datetime.strptime(next_class_init, "%d/%m/%Y %H:%M:%S")
                 previous_class_endtime_plusm = class_final_date_obj + timedelta(minutes=30)
                 previous_class_endtime_plush = class_final_date_obj + timedelta(hours=1)
                 add_next_class = True if (class_uc == next_class_uc) and ((class_final_date_obj == next_class_init_obj) or (previous_class_endtime_plusm == next_class_init_obj) or (previous_class_endtime_plush == next_class_init_obj)) else False
