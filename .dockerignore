@@ -1,0 +1,8 @@
+data/clean*
+env/
+solution_csv/*
+final_schedule.csv
+fitness_report.csv
+README.md
+total_time.txt
+.gitignore

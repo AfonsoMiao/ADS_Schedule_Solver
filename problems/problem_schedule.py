@@ -67,10 +67,6 @@ class ScheduleProblem(PermutationProblem):
     def __get_rooms(self, class_capacity_level):
         level_rooms = self.df_rooms['Capacidade Normal'].unique()
         min_capacity = level_rooms[level_rooms<=class_capacity_level].max() if len(level_rooms[level_rooms<=class_capacity_level]) != 0 else class_capacity_level
-        #use_min = False
-        #if abs(class_capacity_level-min_capacity) <= 5:
-        #    use_min = True
-        #rooms_filtered = self.df_rooms[(self.df_rooms['Capacidade Normal'] >= min_capacity)] if use_min else self.df_rooms[(self.df_rooms['Capacidade Normal'] >= class_capacity_level)]
         rooms_filtered = self.df_rooms[(self.df_rooms['Capacidade Normal'] >= min_capacity)]
         return rooms_filtered['Code'].reset_index(drop=True)
 

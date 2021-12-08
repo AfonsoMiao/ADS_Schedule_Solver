@@ -1,5 +1,5 @@
-data/
-solution_csv/
+data/*
+solution_csv/*
 solution_text/
 env/
 final_schedule.csv
