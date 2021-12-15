@@ -13,6 +13,9 @@ RUN pip install -r requirements.txt
 # copy the content of the local src directory to the working directory
 COPY ./ .
 COPY ./scripts/start.sh .
+RUN chmod 755 ./start.sh
 
 # command to run on container start
-CMD ["./start.sh" ]
+CMD ["./start.sh"]
+#CMD ["tail -f /dev/null"]
+#CMD ["tail", "/dev/null"]

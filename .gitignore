@@ -7,3 +7,5 @@ final_schedule.csv
 fitness_report.csv
 output/*
 !output/.gitkeep
+./Compare_Results.ipynb
+.ipynb_checkpoints
