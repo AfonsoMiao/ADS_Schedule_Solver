@@ -4,8 +4,6 @@ from jmetal.operator.mutation import PermutationSwapMutation
 from jmetal.operator.crossover import PMXCrossover
 from jmetal.util.comparator import MultiComparator
 from jmetal.util.density_estimator import CrowdingDistance
-""" from jmetal.util.ranking import FastNonDominatedRanking
-from jmetal.operator import BinaryTournamentSelection """
 from jmetal.util.solution import get_non_dominated_solutions
 from jmetal.util.termination_criterion import StoppingByEvaluations
 
@@ -27,7 +25,7 @@ def merge_solution(df_classes,df_rooms, solution):
     return df_final[interesting_columns].rename(columns={"Code_x": "Code"})
 
 
-# Merge weekly generated schedules --> final_schedule
+# Merge weekly generated schedules --> create the final schedule (csv file)
 def merge_files():
     mypath = "./solution_csv/"
     # Get name of files
@@ -45,8 +43,6 @@ def merge_files():
     all_columns = all_classes.columns
     df_final = all_classes.merge(df_renamed, how="inner",left_on='Code', right_on='Code').rename(columns={'Unidade de execução_x': 'Unidade de execução', 'Início_x': 'Início', 'Fim_x': 'Fim','Dia_x': 'Dia','Edifício': 'Edifício', 'Número Horas_x': 'Número Horas', 'Inscritos no turno (no 1º semestre é baseado em estimativas)_x': 'Inscritos no turno (no 1º semestre é baseado em estimativas)', 'Lotação_y': 'Lotação', 'Lotação_x': 'Lotação_Default', 'Sala da aula_y': 'Sala da aula'})
     oficial_columns = all_columns.tolist() + ['Lotação_Default']
-    print('Oficial columns: ', oficial_columns)
-    print('Df final columns: ', df_final.columns)
     # Saving final solution
     df_final[oficial_columns].drop(['Número Horas', 'Semana', 'Ano', 'Code'], axis=1).to_csv("./output/final_schedule.csv", index=False, encoding="utf-8-sig")
 
@@ -74,6 +70,7 @@ def return_best_solution_index(objectives_matrix, best_objective):
         if equal_arrays:
             return index
 
+# Runs algorithm for each week schedule
 def test_multi_files():
     all_classes = pd.read_csv('./data/clean_timetable.csv')
     all_rooms = pd.read_csv('./data/clean_rooms.csv')
@@ -82,8 +79,6 @@ def test_multi_files():
     df_classes = all_classes[classes_columns]
     rooms_columns = ['Code','Capacidade Normal', 'Edifício', 'Nome sala']
     df_rooms = all_rooms[rooms_columns]
-    
-
     weeks_array = df_classes['Semana'].unique()
     # Auxiliary variables
     runtime_array = np.array([])
@@ -116,7 +111,6 @@ def test_multi_files():
         runtime = time.time() - start_time
         runtime_array = np.append(runtime_array, [runtime])
         fitness_matrix.append(np.append(best_objective, [str(week), str(runtime)]))
-        print('Optimization ended')
         print('Number of solutions generated: ', len(front))
         print('Result: ', solutions)
         print('Objectives: ', objectives)
@@ -125,7 +119,7 @@ def test_multi_files():
         path = 'week' + str(week)
         df_to_save = merge_solution(df_class_week, df_rooms, best_solution)
         df_to_save.to_csv('./solution_csv/' + path + '.csv', index=False, encoding="utf-8-sig")
-        
+    print('Optimization ended')
 
     #Save a file with total time of algorithm's runtime
     text_file = open("./output/total_time.txt", "w")

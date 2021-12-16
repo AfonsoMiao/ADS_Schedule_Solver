@@ -3,11 +3,13 @@ import numpy as np
 
 data_path = "./data/"
 
+# Read csv files
 df_classes = pd.read_csv(data_path + "timetable.csv", header=0, sep=";", encoding="utf-8-sig")
 df_rooms = pd.read_csv(data_path + "rooms.csv", header=0, sep=";", encoding="utf-8-sig")
-print(df_classes.columns)
 
-print('UC sem datas: ', len(df_classes[df_classes['Dia'].isnull()])) 
+print('UC sem datas: ', len(df_classes[df_classes['Dia'].isnull()]))
+
+# Data preparation
 df_classes = df_classes[df_classes['Dia'].notnull()]
 df_classes['Início'] = (df_classes['Dia'] + " " + df_classes['Início']).astype(str)
 df_classes['Fim'] = (df_classes['Dia'] + " " + df_classes['Fim']).astype(str)

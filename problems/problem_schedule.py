@@ -63,15 +63,14 @@ class ScheduleProblem(PermutationProblem):
         interesting_columns = ['Unidade de execução', 'Início', 'Fim' ,'Dia' ,'Edifício', 'Nome sala', 'Número Horas', 'Inscritos no turno (no 1º semestre é baseado em estimativas)', 'Capacidade Normal']
         return df_final[interesting_columns]
 
-    
+
+    # Get rooms that handle a certain class capacity level
     def __get_rooms(self, class_capacity_level):
-        level_rooms = self.df_rooms['Capacidade Normal'].unique()
-        min_capacity = level_rooms[level_rooms<=class_capacity_level].max() if len(level_rooms[level_rooms<=class_capacity_level]) != 0 else class_capacity_level
-        rooms_filtered = self.df_rooms[(self.df_rooms['Capacidade Normal'] >= min_capacity)]
+        capacity_to_filter = class_capacity_level - 5
+        rooms_filtered = self.df_rooms[(self.df_rooms['Capacidade Normal'] >= capacity_to_filter)]
         return rooms_filtered['Code'].reset_index(drop=True)
 
-    # Stills needs to be better
-    # Only choose a room with higher capacity if rooms that can handle the capacity are full
+    # Choose a room with higher capacity if rooms that can handle the capacity are full
     def __choose_best_room(self, rooms_timetable, array_rooms, class_init):
         available_rooms = []
         for index in range(len(array_rooms)):
@@ -102,7 +101,7 @@ class ScheduleProblem(PermutationProblem):
                 continue
             # Extract useful info of current class
             class_capacity_level = int(self.df_classes.loc[index, 'Inscritos no turno (no 1º semestre é baseado em estimativas)'])
-            class_uc = str(self.df_classes.loc[index, 'Unidade de execução']) #NEW solution
+            class_uc = str(self.df_classes.loc[index, 'Unidade de execução'])
             class_init = str(self.df_classes.loc[index, 'Início'])
             class_final = str(self.df_classes.loc[index, 'Fim'])
             class_final_date_obj = datetime.strptime(class_final, '%d/%m/%Y %H:%M:%S')
