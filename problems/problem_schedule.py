@@ -67,7 +67,7 @@ class ScheduleProblem(PermutationProblem):
     # Get rooms that handle a certain class capacity level
     def __get_rooms(self, class_capacity_level):
         capacity_to_filter = class_capacity_level - 5
-        rooms_filtered = self.df_rooms[(self.df_rooms['Capacidade Normal'] >= capacity_to_filter)]
+        rooms_filtered = self.df_rooms[(self.df_rooms['Capacidade Normal'] >= capacity_to_filter)].sort_values(by=['Capacidade Normal'], ascending=True) #in development --> inserted sort values
         return rooms_filtered['Code'].reset_index(drop=True)
 
     # Choose a room with higher capacity if rooms that can handle the capacity are full
@@ -79,8 +79,9 @@ class ScheduleProblem(PermutationProblem):
             if class_init not in timetable:
                 available_rooms.append(index)
         filtered_rooms = np.take(array_rooms, available_rooms).reset_index(drop=True) if len(available_rooms) != 0 else array_rooms
+        choose_random_room = False if len(available_rooms) == 0 else True #in development
         random_index = random.randint(0, len(filtered_rooms)-1)
-        return filtered_rooms[random_index]
+        return filtered_rooms[random_index] if choose_random_room == True else filtered_rooms[0]
 
     # Generates solution for algorithm
     def create_solution(self) -> PermutationSolution:

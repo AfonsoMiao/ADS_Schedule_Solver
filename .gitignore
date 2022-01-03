@@ -1,6 +1,7 @@
 data/*
 !data/.gitkeep
 solution_csv/*
+!solution_csv/.gitkeep
 solution_text/
 env/
 final_schedule.csv

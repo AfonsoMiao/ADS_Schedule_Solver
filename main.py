@@ -30,6 +30,7 @@ def merge_files():
     mypath = "./solution_csv/"
     # Get name of files
     onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+    del onlyfiles[0]
     first_path = mypath + onlyfiles[0]
     df = pd.read_csv(first_path)
     onlyfiles.pop(0)
