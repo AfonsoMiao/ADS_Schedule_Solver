@@ -5,6 +5,12 @@ Introduzir horário e salas disponíveis na pasta **data**. Atribuir os seguinte
     ADS - Exemplo de horario do 1o Semestre.csv --> timetable.csv
     ADS - Caracterizacao das salas.csv --> rooms.csv
 
+Na pasta dos scripts, mudar o EOL para LF dos seguintes ficheiros:
+
+    copy_results.sh
+    initialize.sh
+    start.sh
+
 Para correr este projeto, ou seja, iniciar a resolução do calendário é necessário correr o seguinte script que se encontra na pasta **scripts**:
 
     ./initialize.sh
