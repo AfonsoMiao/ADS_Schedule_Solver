@@ -68,7 +68,7 @@ def merge_solution(df_schedule, df_solution, df_rooms):
     interesting_columns.remove("Sala da aula")
     interesting_columns.remove("Lotação")
     df_join = df_schedule.merge(df_sol_smp, how="inner", left_on="Code", right_on="Class Code").rename(columns={"Lotação": "Lotação_Default"})
-    df_join[interesting_columns].rename(columns={"Nome sala": "Sala da aula", "Capacidade Normal": "Lotação"}).to_csv("./output/final_schedule2.csv", index=False, encoding="utf-8-sig")
+    df_join[interesting_columns].rename(columns={"Nome sala": "Sala da aula", "Capacidade Normal": "Lotação"}).to_csv("./output/final_schedule_optimized.csv", index=False, encoding="utf-8-sig")
     print('Saved new schedule')
 
 
