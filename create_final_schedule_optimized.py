@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import random
+import time
 import math
 
 # Returns a list of rooms that handles capacity of class
@@ -71,7 +72,7 @@ def merge_solution(df_schedule, df_solution, df_rooms):
     df_join[interesting_columns].rename(columns={"Nome sala": "Sala da aula", "Capacidade Normal": "Lotação"}).to_csv("./output/final_schedule_optimized.csv", index=False, encoding="utf-8-sig")
     print('Saved new schedule')
 
-
+start_time = time.time()
 schedule = pd.read_csv('./data/clean_timetable.csv')
 rooms = pd.read_csv('./data/clean_rooms.csv')
 print("There's %i type of classes" %(len(schedule['Unidade de execução'].unique())))
@@ -99,5 +100,10 @@ for row in df_count_class.values:
     df_solution = df_solution.append(selected_room)
     rooms_timetable = update_timetable(selected_room, rooms_timetable)
 df_solution = df_solution.drop_duplicates()
-
+runtime = time.time() - start_time
+#Save a file with total time of algorithm's runtime
+text_file = open("./output/total_time_optimized.txt", "w")
+string_total_time = "Runtime algorithm: " + str(runtime)
+text_file.write(str(string_total_time))
+text_file.close()
 merge_solution(schedule, df_solution, rooms)
